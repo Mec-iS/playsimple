@@ -3,7 +3,7 @@
 #include "controller.h"
 
 Game::Game(): skip(false), isStarted(false), window(NULL), renderer(NULL) {
-    controller = Controller();
+    this->controller = Controller();
 }
 
 Game::~Game() {
@@ -30,18 +30,18 @@ void Game::draw() {
     SDL_RenderClear(renderer);
     
     // Render
-    std::tuple pos = skoob.getPosition();
+    std::tuple pos = controller.skoob.getPosition();
     sprite.x = std::get<0>(pos);
     sprite.y = std::get<1>(pos);
 
-    this->checkBorders();
+    checkBorders(std::move(controller));
 
     sprite.w = 20 ;
     sprite.h = 20 ;
 
-    std::cout << sprite.x << ", " << sprite.y << std::endl;
+    std::cout << "dashing >>>>" << controller.skoob.isDashing << std::endl;
 
-    if (skoob.isDashing) {
+    if (controller.skoob.isDashing) {
       fillRect(&sprite, 255, 0, 0);
     } else {
       fillRect(&sprite, 155, 0, 0);
@@ -91,10 +91,22 @@ void Game::run() {
 
         // check system keys
         if (SDL_PollEvent(&event)) {
+            // quit behaviour
+            if (controller.keyboard_state_array[SDL_SCANCODE_ESCAPE]) {
+                onQuit(); break;
+            }
             switch (event.type) {
-                    case SDL_QUIT:    onQuit(); break;
+                    case SDL_QUIT: onQuit(); break;
+                    case SDL_KEYUP: 
+                       switch (event.key.keysym.scancode) {
+                         case SDL_SCANCODE_SPACE:
+                            // end dash behaviour
+                            this->controller.skoob.isDashing = false;
+                            std::cout << "dashing " << this->controller.skoob.isDashing << std::endl;
+                       }
             }
         }
+        
         this->update();
         this->draw();
 
@@ -121,7 +133,6 @@ void Game::run() {
 }
 
 void Game::update() {
-    controller.handleInput(skoob);
-    skoob.resetDirection();
+    controller.handleInput();
 }
 

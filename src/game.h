@@ -21,14 +21,6 @@ public:
     // utility methods
     void fillRect(SDL_Rect* rc, int r, int g, int b );
     void fpsChanged(int fps);
-    void checkBorders() {
-        auto pos = skoob.getPosition();
-        
-        if ((0 > std::get<0>(pos) || 0 > std::get<1>(pos)) || 
-            (std::get<0>(pos) > WIN_WIDTH || std::get<1>(pos) > WIN_HEIGHT)) {
-            skoob.resetPosition(0, STARTING_POSITION);
-        }
-    }
     
     // simple event handlers, just encapsulate sprite methods
     void onMove(SDL_Event* event);
@@ -44,7 +36,6 @@ private:
     SDL_Window* window;
     SDL_Renderer* renderer;
     Controller controller;
-    Sprite skoob;
 };
 
 #endif

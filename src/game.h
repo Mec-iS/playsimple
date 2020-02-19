@@ -19,23 +19,24 @@ public:
     void onQuit();
     
     // utility methods
+    void paintSkoob(SDL_Rect* sp);
+    void displaySkoob(SDL_Rect&& sp);
+    void displayBoulders();
     void fillRect(SDL_Rect* rc, int r, int g, int b );
     void fpsChanged(int fps);
     
-    // simple event handlers, just encapsulate sprite methods
-    void onMove(SDL_Event* event);
-    void onDash(SDL_Event* event);
 
     // main loop methods
     void draw();
     void update();
+
+    Controller controller;
 
 private:
     bool skip;
     bool isStarted;
     SDL_Window* window;
     SDL_Renderer* renderer;
-    Controller controller;
 };
 
 #endif

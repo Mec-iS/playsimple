@@ -2,8 +2,25 @@
 #include "layout.h"
 #include "controller.h"
 
+
 Game::Game(): skip(false), isStarted(false), window(NULL), renderer(NULL) {
     this->controller = Controller();
+
+    for (int i = 0; i == 4; i++) {
+        SDL_Rect sprite;
+
+        int rand = controller.generateRandomInt();
+        SDL_Color color = controller.generateRandomColor();
+
+        sprite.w = rand * 10;
+        sprite.h = rand * 10;
+
+        std::tuple<int, int> pos = controller.generateRandomPosition();
+        sprite.x = std::get<0>(pos);
+        sprite.y = std::get<1>(pos);
+
+        controller.boulders.push_back(std::make_tuple(sprite, color));
+    }
 }
 
 Game::~Game() {
@@ -18,36 +35,50 @@ void Game::start() {
     if (SDL_CreateWindowAndRenderer(WIN_WIDTH, WIN_HEIGHT, flags, &window, &renderer)) {
         return;
     }
-    this->isStarted = 1;
+    this->isStarted = true;
     run();
 }
 
 void Game::draw() {
     SDL_Rect sprite;
-    
+
     // Clear
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
     
-    // Render
+    displaySkoob(std::move(sprite));
+    displayBoulders();
+
+    SDL_RenderPresent(renderer);
+}
+
+void Game::displaySkoob(SDL_Rect&& sp) {
+
+    sp.w = 20 ;
+    sp.h = 20 ;
+  
+    // Get position
     std::tuple pos = controller.skoob.getPosition();
-    sprite.x = std::get<0>(pos);
-    sprite.y = std::get<1>(pos);
+    sp.x = std::get<0>(pos);
+    sp.y = std::get<1>(pos);
 
     checkBorders(std::move(controller));
 
-    sprite.w = 20 ;
-    sprite.h = 20 ;
+    paintSkoob(&sp);
+}
 
-    std::cout << "dashing >>>>" << controller.skoob.isDashing << std::endl;
+void Game::displayBoulders() {
+    // std::cout << "boulder created " << std::endl;
+    // std::cout << "color " << std::get<0>(color) << std::get<1>(color) << std::get<2>(color) << std::endl;
+    // std::cout << "position " << std::get<0>(pos) << ", " << std::get<1>(pos) << std::endl;
 
-    if (controller.skoob.isDashing) {
-      fillRect(&sprite, 255, 0, 0);
-    } else {
-      fillRect(&sprite, 155, 0, 0);
+    for (std::tuple<SDL_Rect, SDL_Color> it : controller.boulders) {
+       SDL_Rect* sprite = &std::get<0>(it);
+       SDL_Color color = std::get<1>(it);
+       
+       fillRect(sprite, color.r, color.g, color.b);
     }
-    
-    SDL_RenderPresent(renderer);
+
 }
 
 void Game::stop() {
@@ -62,13 +93,22 @@ void Game::stop() {
     SDL_Quit();
 }
 
+void Game::paintSkoob(SDL_Rect* sp) {
+    if (controller.isDashing) {
+      fillRect(sp, 255, 0, 0);
+      std::cout << "dashing >>>>" << controller.isDashing << std::endl;
+    } else {
+      fillRect(sp, 155, 155, 0);
+    }
+}
+
 void Game::fillRect(SDL_Rect* rc, int r, int g, int b ) {
     SDL_SetRenderDrawColor(renderer, r, g, b, SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, rc);
 }
 
 void Game::fpsChanged( int fps ) {
-    std::string t =  "PlaySimple";
+    std::string t =  "Skoob :: PlaySimple";
     std::cout << t << " FPS " << fps << std::endl;
     SDL_SetWindowTitle(window, t.c_str());
 }
@@ -85,29 +125,14 @@ void Game::run() {
     int frame_count = 0;
     this->isStarted = true;
 
-    SDL_Event event;
     while (this->isStarted) {
         frame_start = SDL_GetTicks();
 
-        // check system keys
-        if (SDL_PollEvent(&event)) {
-            // quit behaviour
-            if (controller.keyboard_state_array[SDL_SCANCODE_ESCAPE]) {
-                onQuit(); break;
-            }
-            switch (event.type) {
-                    case SDL_QUIT: onQuit(); break;
-                    case SDL_KEYUP: 
-                       switch (event.key.keysym.scancode) {
-                         case SDL_SCANCODE_SPACE:
-                            // end dash behaviour
-                            this->controller.skoob.isDashing = false;
-                            std::cout << "dashing " << this->controller.skoob.isDashing << std::endl;
-                       }
-            }
-        }
+        // handle events
+        int quit = controller.handleInput();
+        if (quit) { onQuit(); break; }
         
-        this->update();
+        // render sprites
         this->draw();
 
         frame_end = SDL_GetTicks();
@@ -132,7 +157,4 @@ void Game::run() {
     }
 }
 
-void Game::update() {
-    controller.handleInput();
-}
 

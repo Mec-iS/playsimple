@@ -1,3 +1,6 @@
+# Skoob
+A simple mini-game. Remove obstacles on your path with energy and speed!
+
 ## Dependencies for Running Locally
 * cmake >= 3.7
   * All OSes: [click here for installation instructions](https://cmake.org/install/)
@@ -19,3 +22,7 @@
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./PlaySimple`.
+
+## Game controls
+
+Move the skoob with **ARROWS** and dash with **SPACE** to hit and destroy boulders in the screen.

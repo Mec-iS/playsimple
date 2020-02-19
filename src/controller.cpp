@@ -33,7 +33,6 @@ void moveDown(Controller&& ctrl) {
 };
 
 void dash(Controller&& ctrl) {
-    ctrl.skoob.isDashing = true;
     ctrl.skoob.prev_x = ctrl.skoob.x;
     ctrl.skoob.prev_y = ctrl.skoob.y;
     std::tuple<int, int> dash_to = ctrl.destination();
@@ -50,20 +49,45 @@ void checkBorders(Controller&& ctrl) {
         (std::get<0>(pos) > WIN_WIDTH || std::get<1>(pos) > WIN_HEIGHT)) {
         ctrl.resetPosition(0, STARTING_POSITION);
     }
-    ctrl.skoob.isDashing = false;
 }
 
 
 // controller's methods
 void Controller::resetPosition(int reset_x, int reset_y) {
-    skoob.isDashing = false;
     skoob.x = reset_x;
     skoob.y = reset_y;
     skoob.prev_x = 0;
     skoob.prev_y = STARTING_POSITION;
 };
 
-void Controller::handleInput() {
+int Controller::handleInput() {
+    SDL_Event event;
+    
+    // check system keys
+    while (SDL_PollEvent(&event)) {
+        // quit behaviour
+        if (keyboard_state_array[SDL_SCANCODE_ESCAPE]) {
+            return 1;
+        }
+        switch (event.type) {
+            case SDL_QUIT: return 1;
+            // case SDL_KEYUP: 
+            //     switch (event.key.keysym.scancode) {
+            //         case SDL_SCANCODE_SPACE:
+            //         // end dash behaviour
+            //         isDashing = false;
+            //         std::cout << "KEYUP - dashing " << isDashing << std::endl;
+            //     };
+            // case SDL_KEYDOWN: 
+            //     switch (event.key.keysym.scancode) {
+            //         case SDL_SCANCODE_SPACE:
+            //         // end dash behaviour
+            //         isDashing = true;
+            //         std::cout << "KEYDOWN - dashing " << isDashing << std::endl;
+            //     }
+        }
+    }
+
     // loop through the ```keys->methods``` map
     std::map<int, void(*)(Controller&& ctrl)>::iterator it;
     for (it = directions_mapping.begin(); it != directions_mapping.end(); it++) {
@@ -73,8 +97,15 @@ void Controller::handleInput() {
         if (keyboard_state_array[kcode]) {
             // execute mapped method
             std::get<1>((*it))(std::move(*this));
-            std::cout << "dashing " << this->skoob.isDashing << std::endl;
+
+            if (kcode == SDL_SCANCODE_SPACE) {
+                isDashing = true;
+                std::cout << "dashing " << isDashing << std::endl;
+            }
         }
+        isDashing = false;
     };
+
+    return 0;
 
 }

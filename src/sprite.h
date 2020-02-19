@@ -19,8 +19,6 @@ public:
         return x == prev_x && y == prev_y;
     };
 
-    bool isDashing;  // jumping state
-
     // space
     int x, y;
     int prev_x, prev_y;

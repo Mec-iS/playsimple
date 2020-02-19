@@ -58,7 +58,7 @@ void Game::displaySkoob(SDL_Rect&& sp) {
     sp.h = 20 ;
   
     // Get position
-    std::tuple pos = controller.skoob.getPosition();
+    std::tuple<int, int> pos = controller.skoob.getPosition();
     sp.x = std::get<0>(pos);
     sp.y = std::get<1>(pos);
 

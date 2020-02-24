@@ -20,7 +20,7 @@ void moveRight(Controller&& ctrl);
 void moveUp(Controller&& ctrl);
 void moveDown(Controller&& ctrl);
 void dash(Controller&& ctrl);
-void checkBorders(Controller&& ctrl);
+void checkBorders(Controller&& ctrl, SDL_Rect*);
 
 
 class Controller {
@@ -51,25 +51,26 @@ public:
   int generateRandomInt() {
     std::random_device dev;
     std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist4(1,4);
+    std::uniform_int_distribution<std::mt19937::result_type> dist4(2,6);
     return dist4(rng);
   }
 
-  SDL_Color generateRandomColor() {
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist255(50,255);
-    // return SDL_Color { r: (Uint8) dist255(rng), g: (Uint8) dist255(rng),
-    //                    b: (Uint8) dist255(rng), a: SDL_ALPHA_OPAQUE };
-    return SDL_Color { r: 0, g: 0,
-                       b: 0, a: SDL_ALPHA_OPAQUE };
-  }
+  // SDL_Color generateRandomColor() {
+  //   std::random_device dev;
+  //   std::mt19937 rng(dev());
+  //   std::uniform_int_distribution<std::mt19937::result_type> dist255(50,255);
+  //   // return SDL_Color { r: (Uint8) dist255(rng), g: (Uint8) dist255(rng),
+  //   //                    b: (Uint8) dist255(rng), a: SDL_ALPHA_OPAQUE };
+  //   SDL_Color color = SDL_Color { r: 0, g: 0,
+  //                      b: 0, a: SDL_ALPHA_OPAQUE };
+  //   return color;
+  // }
 
   std::tuple<int, int> generateRandomPosition() {
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_int_distribution<std::mt19937::result_type> distWidth(20, WIN_WIDTH);
-    std::uniform_int_distribution<std::mt19937::result_type> distHeight((-1 * WIN_HEIGHT), -20);
+    std::uniform_int_distribution<std::mt19937::result_type> distHeight(20, WIN_HEIGHT);
     return std::make_tuple(distWidth(rng), distHeight(rng));
   }
   
@@ -90,7 +91,7 @@ public:
   }; // compute the destination of a dash
   void resetPosition(int reset_x, int reset_y);
   Sprite skoob;
-  std::vector<std::tuple<SDL_Rect, SDL_Color>> boulders;
+  std::vector<std::tuple<SDL_Rect, bool>> boulders;
 };
 
 #endif

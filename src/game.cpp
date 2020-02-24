@@ -4,13 +4,15 @@
 
 
 Game::Game(): skip(false), isStarted(false), window(NULL), renderer(NULL) {
+    std::cout << "Creating Game instance" << std::endl;
     this->controller = Controller();
 
-    for (int i = 0; i == 4; i++) {
+    int i = 0;
+    while (i < 4) {
+        std::cout << "Creating boulders" << std::endl;
         SDL_Rect sprite;
 
         int rand = controller.generateRandomInt();
-        SDL_Color color = controller.generateRandomColor();
 
         sprite.w = rand * 10;
         sprite.h = rand * 10;
@@ -19,8 +21,11 @@ Game::Game(): skip(false), isStarted(false), window(NULL), renderer(NULL) {
         sprite.x = std::get<0>(pos);
         sprite.y = std::get<1>(pos);
 
-        controller.boulders.push_back(std::make_tuple(sprite, color));
+        controller.boulders.emplace_back(std::make_tuple(sprite, true));
+        i += 1;
     }
+
+    // std::cout << i << std::endl;
 }
 
 Game::~Game() {
@@ -45,9 +50,9 @@ void Game::draw() {
     // Clear
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
-    
+
+    displayBoulders();    
     displaySkoob(std::move(sprite));
-    displayBoulders();
 
     SDL_RenderPresent(renderer);
 }
@@ -62,21 +67,25 @@ void Game::displaySkoob(SDL_Rect&& sp) {
     sp.x = std::get<0>(pos);
     sp.y = std::get<1>(pos);
 
-    checkBorders(std::move(controller));
+    std::cout << "Skoob: " << sp.x << ", " << sp.y << std::endl;
 
     paintSkoob(&sp);
+    checkBorders(std::move(controller), &sp);
 }
 
 void Game::displayBoulders() {
-    // std::cout << "boulder created " << std::endl;
+    std::cout << "Displaying boulders" << std::endl;
     // std::cout << "color " << std::get<0>(color) << std::get<1>(color) << std::get<2>(color) << std::endl;
     // std::cout << "position " << std::get<0>(pos) << ", " << std::get<1>(pos) << std::endl;
 
-    for (std::tuple<SDL_Rect, SDL_Color> it : controller.boulders) {
-       SDL_Rect* sprite = &std::get<0>(it);
-       SDL_Color color = std::get<1>(it);
+    for (std::tuple<SDL_Rect, bool> it : controller.boulders) {
+        std::cout << "Boulder exists >>>>>> " << std::get<1>(it) << std::endl;
+        if(std::get<1>(it)) {
+           SDL_Rect* sprite = &std::get<0>(it);
+           std::cout << "Sprite: " << sprite->x << ", " << sprite->y << std::endl;
        
-       fillRect(sprite, color.r, color.g, color.b);
+           fillRect(sprite, 0, 0, 0);
+        }
     }
 
 }

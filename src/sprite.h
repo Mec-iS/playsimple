@@ -11,11 +11,11 @@ class Sprite {
 public:
     Sprite() :x(0), y(STARTING_POSITION) {}
     
-    std::tuple<int, int> getPosition() {
+    std::tuple<int, int> const getPosition() {
         return std::make_tuple(x, y);
     };
 
-    bool isMoving() {
+    bool const isMoving() {
         return x == prev_x && y == prev_y;
     };
 

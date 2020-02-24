@@ -1,6 +1,8 @@
 #include "controller.h"
 
 #include <iterator>
+#include <tuple>
+#include <algorithm>
 
 
 // moves
@@ -42,13 +44,37 @@ void dash(Controller&& ctrl) {
     ctrl.resetDirection();
 };
 
-void checkBorders(Controller&& ctrl) {
+// void erase(std::vector<SDL_Rect>& v, SDL_Rect elem) {
+//     std::vector<SDL_Rect>::iterator it = remove(v.begin(), v.end(), elem);
+//     v.erase(it, v.end());
+// }
+
+void checkBorders(Controller&& ctrl, SDL_Rect* sp) {
     auto pos = ctrl.skoob.getPosition();
     
+    // check external borders
     if ((0 > std::get<0>(pos) || 0 > std::get<1>(pos)) || 
         (std::get<0>(pos) > WIN_WIDTH || std::get<1>(pos) > WIN_HEIGHT)) {
         ctrl.resetPosition(0, STARTING_POSITION);
     }
+
+    // check boulders collission
+    int i = 0;
+    int idx = -1;
+    for (std::tuple<SDL_Rect, bool>& boulder: ctrl.boulders) {
+        if(std::get<1>(boulder)) {
+            SDL_Rect b = std::get<0>(boulder);
+            if (SDL_HasIntersection(sp, &b)) {
+                std::cout << "Collision" << std::endl;
+                idx = i;
+                std::cout << "Boulder destroyed " << idx << std::endl;
+                std::get<1>(boulder) = false;
+                std::cout << "Boulder exists " << std::get<1>(boulder) << std::endl;
+            }
+        }
+        i++;
+    }
+
 }
 
 

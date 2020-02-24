@@ -139,7 +139,7 @@ void Game::run() {
 
         // handle events
         int quit = controller.handleInput();
-        if (quit) { onQuit(); break; }
+        if (quit || this->controller.score > 3) { onQuit(); break; }
         
         // render sprites
         this->draw();

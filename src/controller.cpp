@@ -70,6 +70,8 @@ void checkBorders(Controller&& ctrl, SDL_Rect* sp) {
                 std::cout << "Boulder destroyed " << idx << std::endl;
                 std::get<1>(boulder) = false;
                 std::cout << "Boulder exists " << std::get<1>(boulder) << std::endl;
+                ctrl.score += 1;
+                std::cout << "Score " << ctrl.score  << std::endl;
             }
         }
         i++;

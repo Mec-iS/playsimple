@@ -92,6 +92,8 @@ public:
   void resetPosition(int reset_x, int reset_y);
   Sprite skoob;
   std::vector<std::tuple<SDL_Rect, bool>> boulders;
+
+  int score = 0;
 };
 
 #endif
